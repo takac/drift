@@ -1,7 +1,6 @@
 import git
 import re
 from util import memoize
-from collections import defaultdict
 
 class Drift(object):
 
@@ -14,13 +13,13 @@ class Drift(object):
 
     @memoize
     def unique_change_ids(self, branch_name):
-        self.branch_dict[branch_name] = defaultdict(list)
+        self.branch_dict[branch_name] = {}
         for commit in self.repo.iter_commits(branch_name):
             match = self.CHANGE_ID_RE.search(commit.message)
             if match:
-                self.branch_dict[branch_name][match.group(1)].append(commit)
+                self.branch_dict[branch_name][match.group(1)] = commit
         return self.branch_dict[branch_name]
 
     def drift(self, branch_one, branch_two):
-        return len(self.unique_change_ids(branch_one).viewkeys() - 
+        return len(self.unique_change_ids(branch_one).viewkeys() -
                 self.unique_change_ids(branch_two).viewkeys())
