@@ -1,3 +1,7 @@
 .venv/
 *.pyc
 *.log
+build/
+.tox/
+dist/
+*.egg-info
