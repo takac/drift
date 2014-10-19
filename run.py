@@ -3,38 +3,27 @@
 import drift
 import re
 import datetime
-
-
-def print_drift(drifter, upstream_branch, local_branch):
-    print("Comparing {0} to {1}".format(
-        upstream_branch, local_branch))
-
-    in_upstream = drifter.unique_change_ids(upstream_branch)
-    print("Unique change ids in {0}: {1}".format(
-          upstream_branch, len(in_upstream)))
-
-    in_local = drifter.unique_change_ids(local_branch)
-    print("Unique change ids in {0}: {1}".format(
-          local_branch, len(in_local)))
-
-    change_id_diff = drifter.drift(upstream_branch, local_branch)
-    print("Number of unique change ids in {0} and not in {1}: {2}"
-          .format(upstream_branch, local_branch,
-                  change_id_diff))
+import sys
 
 
 if __name__ == '__main__':
-    import sys
     if len(sys.argv) == 4:
+        # Repo to analyse
         drifter = drift.Drift(sys.argv[1])
-        upstream = drifter.unique_change_ids(sys.argv[2])
-        local = drifter.unique_change_ids(sys.argv[3])
+        # upstream branch name
+        upstream_changes = drifter.change_ids(sys.argv[2])
+        # local branch name
+        local = drifter.change_ids(sys.argv[3])
+
         subj = re.compile('([^\n]{0,60})')
-        diff = upstream.viewkeys() - local.viewkeys()
+        diff = upstream_changes.viewkeys() - local.viewkeys()
+        # Sort changes from youngest to oldest commit date
         sorted_commits = sorted(
-            diff, key=lambda r: upstream.get(r).committed_date, reverse=True)
+            diff, key=lambda r: upstream_changes.get(r)[0].committed_date,
+            reverse=True)
         for i in sorted_commits:
-            commit = upstream[i]
+            commit_list = upstream_changes[i]
+            commit = commit_list[0]
             committed_time = datetime.datetime.fromtimestamp(
                 commit.committed_date).strftime("%d/%m/%Y@%H:%M")
             print("{0} {1} {2} {3}".format(
