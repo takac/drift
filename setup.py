@@ -1,11 +1,16 @@
 #!/usr/bin/env python
 
-from setuptools import setup
+# THIS FILE IS MANAGED BY THE GLOBAL REQUIREMENTS REPO - DO NOT EDIT
+import setuptools
 
-setup(name='drift',
-      version='0.0.1',
-      description='Utility for tracking upstream changes in Git and Gerrit',
-      author='Tom Cammann',
-      author_email='cammann.tom@gmail.com   ',
-      packages=['drift'],
-      install_requires=['gitpython>=0.3.2.RC1'])
+# In python < 2.7.4, a lazy loading of package `pbr` will break
+# setuptools if some other modules registered functions in `atexit`.
+# solution from: http://bugs.python.org/issue15881#msg170215
+try:
+    import multiprocessing  # noqa
+except ImportError:
+    pass
+
+setuptools.setup(
+    setup_requires=['pbr'],
+    pbr=True)
